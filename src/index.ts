@@ -26,7 +26,7 @@ const isLoggedIn = async () => {
 const initRequest = async () => {
     // tslint:disable-next-line:no-console
     console.log("[INFO] [POJ] Puppeteer is initializing");
-    browser = await launch({ headless: false });
+    browser = await launch();
     const page = await browser.newPage();
     try {
         await page.goto("http://poj.org");
