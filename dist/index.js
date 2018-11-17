@@ -1,11 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = require("fs");
+const path_1 = require("path");
 const puppeteer_1 = require("puppeteer");
 const interfaces_1 = require("./interfaces");
 const MAX_SOURCE_SIZE = 16 * 1024 * 1024;
 const UPDATE_INTERVAL = 1000;
-const config = JSON.parse(fs_1.readFileSync("config.json").toString());
+const configPath = path_1.join(__dirname, "..", "config.json");
+const config = JSON.parse(fs_1.readFileSync(configPath).toString());
 let browser = null;
 const isLoggedIn = async () => {
     if (!browser) {
@@ -25,7 +27,7 @@ const isLoggedIn = async () => {
 };
 const initRequest = async () => {
     console.log("[INFO] [POJ] Puppeteer is initializing");
-    browser = await puppeteer_1.launch({ headless: false });
+    browser = await puppeteer_1.launch();
     const page = await browser.newPage();
     try {
         await page.goto("http://poj.org");
@@ -132,6 +134,7 @@ const fetch = async (runID) => {
             details: {
                 time,
                 memory,
+                runID,
             },
         };
         await page.close();
@@ -152,7 +155,7 @@ const updateSolutionResults = async () => {
             }
         }
         catch (e) {
-            cb({ status: interfaces_1.SolutionResult.JudgementFailed, score: 0, details: { error: e.message } });
+            cb({ status: interfaces_1.SolutionResult.JudgementFailed, score: 0, details: { error: e.message, runID: runid } });
         }
     }
     setTimeout(updateSolutionResults, UPDATE_INTERVAL);
